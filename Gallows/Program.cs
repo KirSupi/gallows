@@ -7,7 +7,7 @@ namespace gallows;
 
 class Program
 {
-    static void Main()
+    private static void Main()
     {
         IDataLayer dataLayer = new FileData("./assets");
         IUseCaseLayer useCaseLayer = new UseCase(dataLayer);
