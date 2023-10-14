@@ -3,7 +3,7 @@ using gallows.DataLayer;
 
 interface IUserCaseLayer
 {
-    
+    LoadSavedGame();
 }
 
 public class UseCase

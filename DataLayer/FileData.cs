@@ -8,6 +8,10 @@ interface IDataLayer
 
 public class FileData
 {
-    public FileData() {
-}
+    private string _root = "./";
+    
+    public FileData(string root)
+    {
+        _root = root;
+    }
 }

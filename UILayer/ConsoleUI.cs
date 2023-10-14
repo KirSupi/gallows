@@ -9,12 +9,14 @@ public class ConsoleUI
     private const string ModeSettings = "settings";
 
     private const string TextMenuNewGame = "Новая игра";
+    private const string TextMenuLoadSavedGame = "Загрузить сохранённую игру";
     private const string TextMenuSettings = "Настройки";
     private const string TextMenuExit = "Выход";
 
     private readonly string[] _textMenu =
     {
         TextMenuNewGame,
+        TextMenuLoadSavedGame,
         TextMenuSettings,
         TextMenuExit
     };
@@ -78,6 +80,8 @@ public class ConsoleUI
         switch (selectedMenuItem)
         {
             case TextMenuNewGame:
+                return false;
+            case TextMenuLoadSavedGame:
                 return false;
             case TextMenuSettings:
                 return false;
