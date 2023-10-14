@@ -1,3 +1,5 @@
+using System.Data;
+
 namespace gallows.UseCaseLayer;
 using gallows.Domain;
 
@@ -25,4 +27,9 @@ public class UseCase : IUseCaseLayer
     {
         _game = new Game();
     }
+
+    // public State GetState()
+    // {
+    //     
+    // }
 }
