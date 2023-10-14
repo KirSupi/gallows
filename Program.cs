@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        var dataLayer = new FileData();
+        var dataLayer = new FileData("");
         var useCaseLayer = new UseCase(dataLayer);
         var uiLayer = new ConsoleUI(useCaseLayer);
 
