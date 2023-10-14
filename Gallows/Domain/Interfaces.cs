@@ -2,7 +2,8 @@ namespace gallows.Domain;
 
 public interface IDataLayer
 {
-    (Game, bool) LoadSavedGame();
+    void SaveGame(Game? g);
+    Game? LoadSavedGame();
 }
 
 public interface IUseCaseLayer
