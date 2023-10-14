@@ -3,15 +3,22 @@ using gallows.Domain;
 
 public class UseCase : IUseCaseLayer
 {
-    private IDataLayer _dl;
+    private IDataLayer _data;
+    private Game _game;
     
-    public UseCase(IDataLayer dl)
+    
+    public UseCase(IDataLayer data)
     {
-        _dl = dl;
+        _data = data;
     }
 
-    public void LoadSavedGame()
+    public bool LoadSavedGame()
     {
+        bool exists;
+        
+        (_game, exists) = _data.LoadSavedGame();
+        
+        return exists;
     }
 
     public void StartNewGame()

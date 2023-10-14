@@ -1,6 +1,6 @@
 namespace gallows.Domain;
 
-public struct SavedGame
+public struct Game
 {
     int CreatedAt;
     int Scores;

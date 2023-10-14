@@ -15,8 +15,8 @@ public class FileData : IDataLayer
         _root = root;
     }
 
-    public SavedGame LoadSavedGame()
+    public (Game, bool) LoadSavedGame()
     {
-        return new();
+        return (new(), false);
     }
 }
