@@ -3,7 +3,7 @@ using gallows.Domain;
 
 public class UseCase : IUseCaseLayer
 {
-    private IDataLayer _data;
+    private readonly IDataLayer _data;
     private Game? _game;
     
     
@@ -17,16 +17,7 @@ public class UseCase : IUseCaseLayer
         try
         {
             _game = _data.LoadSavedGame();
-            if (_game != null)
-            {
-                // Игра успешно загружена
-            }
-            else
-            {
-                // Обработка случая, когда игра не была загружена
-                // return _game != null;
-                return false;
-            }
+            return _game != null; // возвращаем true, если нашли созранённую игру и загрузили её
         }
         catch (GameLoadException ex)
         {
