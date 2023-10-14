@@ -5,8 +5,8 @@ using gallows.Domain;
 
 public class UseCase : IUseCaseLayer
 {
-    private IDataLayer _data;
-    private Game _game;
+    private readonly IDataLayer _data;
+    private Game? _game;
     
     
     public UseCase(IDataLayer data)
@@ -16,16 +16,35 @@ public class UseCase : IUseCaseLayer
 
     public bool LoadSavedGame() 
     {
-        bool exists;
+        try
+        {
+            _game = _data.LoadSavedGame();
+            return _game != null; // возвращаем true, если нашли созранённую игру и загрузили её
+        }
+        catch (GameLoadException ex)
+        {
+            Console.WriteLine($"Error loading game: {ex.Message}");
+            // Дополнительная логика обработки ошибки загрузки игры
+        }
         
-        (_game, exists) = _data.LoadSavedGame();
-
-        return exists;
+        return true;
     }
 
+    public void SaveGame(Game g)
+    {
+        try
+        {
+            _data.SaveGame(_game);
+        }
+        catch (GameSaveException ex)
+        {
+            Console.WriteLine($"Error saving game: {ex.Message}");
+            // Дополнительная логика обработки ошибки сохранения игры
+        }
+    }
     public void StartNewGame()
     {
-        _game = new Game();
+        _game = new Game?();
     }
 
     // public State GetState()
