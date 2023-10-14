@@ -23,6 +23,6 @@ public class UseCase : IUseCaseLayer
 
     public void StartNewGame()
     {
-        
+        _game = new Game();
     }
 }

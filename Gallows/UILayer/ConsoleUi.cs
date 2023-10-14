@@ -84,8 +84,17 @@ public class ConsoleUi : IUiLayer
                 _uc.StartNewGame();
                 return false;
             case TextMenuLoadSavedGame:
-                _mode = ModeGame;
-                _uc.LoadSavedGame();
+                var exists = _uc.LoadSavedGame();
+                if (exists)
+                {
+                    _mode = ModeGame;
+                }
+                else
+                {
+                    _mode = ModeMenu;
+                    Console.WriteLine("Сохранений нет");
+                }
+
                 return false;
             case TextMenuSettings:
                 _mode = ModeSettings;
