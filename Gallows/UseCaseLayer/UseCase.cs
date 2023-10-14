@@ -12,12 +12,12 @@ public class UseCase : IUseCaseLayer
         _data = data;
     }
 
-    public bool LoadSavedGame()
+    public bool LoadSavedGame() 
     {
         bool exists;
         
         (_game, exists) = _data.LoadSavedGame();
-        
+
         return exists;
     }
 

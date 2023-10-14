@@ -12,7 +12,6 @@ class Program
         IDataLayer dataLayer = new FileData();
         IUseCaseLayer useCaseLayer = new UseCase(dataLayer);
         IUiLayer uiLayer = new ConsoleUi(useCaseLayer);
-
         uiLayer.Run();
     }
 }

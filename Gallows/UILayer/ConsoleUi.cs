@@ -1,3 +1,4 @@
+using System.Reflection.Metadata;
 using gallows.Domain;
 
 namespace gallows.UILayer;
@@ -82,12 +83,14 @@ public class ConsoleUi : IUiLayer
             case TextMenuNewGame:
                 _mode = ModeGame;
                 _uc.StartNewGame();
+                Console.Clear();
                 return false;
             case TextMenuLoadSavedGame:
                 var exists = _uc.LoadSavedGame();
                 if (exists)
                 {
                     _mode = ModeGame;
+                    Console.Clear();
                 }
                 else
                 {
@@ -98,16 +101,30 @@ public class ConsoleUi : IUiLayer
                 return false;
             case TextMenuSettings:
                 _mode = ModeSettings;
+                Console.Clear();
                 return false;
             case TextMenuExit:
+                Console.Clear();
                 return true;
             default:
+                Console.Clear();
                 return false;
         }
     }
 
     private void GameHandler()
     {
+        var input = Console.ReadLine();
+        
+        while (true)
+        {
+            if (input == null) return;
+            
+            if (input.Length == 1 && Const.Alphabet.Contains(input.ToLower()[0]))
+            {
+                
+            }
+        }
     }
 
     private void SettingsHandler()
