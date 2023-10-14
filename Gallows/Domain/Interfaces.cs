@@ -8,6 +8,7 @@ public interface IDataLayer
 
 public interface IUseCaseLayer
 {
+    void SaveGame();
     bool LoadSavedGame();
     void StartNewGame();
 }
