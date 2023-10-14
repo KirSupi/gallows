@@ -25,7 +25,7 @@ public class FileData : IDataLayer
         }
         catch (FileNotFoundException)
         {
-            throw new GameLoadException("GAME_FILE_NOT_FOUND: The game file was not found.");
+            return null;
         }
         catch (Exception e)
         {
