@@ -6,6 +6,7 @@ public class FileData : IDataLayer
 {
     private readonly string _root = "./";
     private const string SavedGameFileName = "saved_game.json";
+    private const string WordsFileName = "words.json";
     public FileData()
     {
     }
