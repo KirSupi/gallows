@@ -33,7 +33,7 @@ public class ConsoleUi : IUiLayer
     public void Run()
     {
         var exit = false;
-        while (true)
+        while (!exit)
         {
             switch (_mode)
             {
@@ -47,8 +47,6 @@ public class ConsoleUi : IUiLayer
                     SettingsHandler();
                     break;
             }
-
-            if (exit) break;
         }
     }
 

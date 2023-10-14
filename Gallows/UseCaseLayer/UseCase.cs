@@ -1,8 +1,6 @@
-using System.Data;
-
 namespace gallows.UseCaseLayer;
 
-using gallows.Domain;
+using Domain;
 
 public class UseCase : IUseCaseLayer
 {
