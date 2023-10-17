@@ -14,6 +14,9 @@ public interface IUseCaseLayer
     void SaveGame();
     bool LoadSavedGame();
     void StartNewGame();
+
+    GameState GetState();
+    void MakeMove(char letter);
 }
 
 public interface IUiLayer

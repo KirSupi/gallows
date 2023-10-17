@@ -22,7 +22,7 @@ public class ConsoleUi : IUiLayer
         TextMenuExit
     };
 
-    private IUseCaseLayer _uc;
+    private readonly IUseCaseLayer _uc;
     private string _mode = ModeMenu;
 
     public ConsoleUi(IUseCaseLayer uc)
@@ -113,19 +113,60 @@ public class ConsoleUi : IUiLayer
     private void GameHandler()
     {
         var input = Console.ReadLine();
-        
+
         while (true)
         {
             if (input == null) return;
-            
+
             if (input.Length == 1 && Const.Alphabet.Contains(input.ToLower()[0]))
             {
-                
+                _uc.MakeMove(input.ToLower()[0]);
             }
         }
     }
 
     private void SettingsHandler()
     {
+    }
+
+    private void DrawGame(Game game)
+    {
+        Console.WriteLine($"Очки: {game.Scores}\tОтгаданных слов: {game.PreviousWords.Length}");
+        Console.WriteLine();
+        
+        Console.WriteLine(GetGallowsState(game.Damage));
+    }
+
+    // Возвращает рисунок человечка на виселице в зависимости от его "урона" (от 0 до 100, если больше 100,
+    // то человечек уже повешен)
+    private string GetGallowsState(int damage)
+    {
+        switch (damage)
+        {
+            case >= 0 and < 10:
+                return Consts.Gallows0;
+            case >= 10 and < 20:
+                return Consts.Gallows10;
+            case >= 20 and < 30:
+                return Consts.Gallows20;
+            case >= 30 and < 40:
+                return Consts.Gallows30;
+            case >= 40 and < 50:
+                return Consts.Gallows40;
+            case >= 50 and < 60:
+                return Consts.Gallows50;
+            case >= 60 and < 70:
+                return Consts.Gallows60;
+            case >= 70 and < 80:
+                return Consts.Gallows70;
+            case >= 80 and < 90:
+                return Consts.Gallows80;
+            case >= 90 and < 100:
+                return Consts.Gallows90;
+            case > 100:
+                return Consts.Gallows100;
+            default:
+                throw new Exception("damage must be at least 0");
+        }
     }
 }
