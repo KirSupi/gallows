@@ -46,4 +46,42 @@ public class FileData : IDataLayer
             throw new GameSaveException($"GAME_SAVE_ERROR: {e.Message}");
         }
     }
+
+    public string GetRandomWord(string category)
+    {
+        string json = File.ReadAllText(WordsFileName);
+        var data = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json);
+        var collection = data[category];
+        Random random = new Random();
+        int randomIndex = random.Next(collection.Count);
+        return collection[randomIndex];
+    }
+
+    public string[] GetWordsCategories()
+    {
+        string json = File.ReadAllText(WordsFileName);
+        try
+        {
+            // Распарсим JSON в объект.
+            var data = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json);
+
+            // Инициализируем массив с размером количества категорий в JSON-файле.
+            string[] categories = new string[data.Keys.Count];
+
+            int index = 0;
+            // Добавляем все ключи (категории) в массив.
+            foreach (var key in data.Keys)
+            {
+                categories[index] = key;
+                index++;
+            }
+
+            return categories;
+        }
+        catch (JsonException e)
+        {
+            Console.WriteLine("Ошибка при чтении JSON: " + e.Message);
+            return new string[0]; // В случае ошибки возвращаем пустой массив строк.
+        }
+    }
 }
