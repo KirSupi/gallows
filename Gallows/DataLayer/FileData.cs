@@ -20,8 +20,8 @@ public class FileData : IDataLayer
     {
         try
         {
-            string jsonString = File.ReadAllText(Path.Join(_root, SavedGameFileName));
-            Game g = JsonSerializer.Deserialize<Game>(jsonString)!;
+            var jsonString = File.ReadAllText(Path.Join(_root, SavedGameFileName));
+            var g = JsonSerializer.Deserialize<Game>(jsonString)!;
             return g;
         }
         catch (FileNotFoundException)
@@ -32,7 +32,6 @@ public class FileData : IDataLayer
         {
             throw new GameLoadException($"GAME_LOAD_ERROR: {e.Message}");
         }
-        
     }
 
     public void SaveGame(Game? g)
