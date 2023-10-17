@@ -4,6 +4,9 @@ public interface IDataLayer
 {
     void SaveGame(Game? g);
     Game? LoadSavedGame();
+
+    string[] GetWordsCategories();
+    string GetRandomWord(string category);
 }
 
 public interface IUseCaseLayer
