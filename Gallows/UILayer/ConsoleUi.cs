@@ -127,6 +127,7 @@ public class ConsoleUi : IUiLayer
 
     private void SettingsHandler()
     {
+        
     }
 
     private void DrawGame(Game game)

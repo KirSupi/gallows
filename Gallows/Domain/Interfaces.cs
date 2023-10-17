@@ -4,6 +4,8 @@ public interface IDataLayer
 {
     void SaveGame(Game? g);
     Game? LoadSavedGame();
+    void SaveSettings(Settings? s);
+    Settings? LoadSettings();
 
     string[] GetWordsCategories();
     string GetRandomWord(string category);
