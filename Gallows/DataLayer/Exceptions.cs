@@ -7,6 +7,11 @@ public class GameLoadException : Exception
     }
 }
 
+public class JsonParseException : Exception
+{
+    public JsonParseException(string message) : base(message) { }
+}
+
 public class GameSaveException : Exception
 {
     public GameSaveException(string message) : base(message)

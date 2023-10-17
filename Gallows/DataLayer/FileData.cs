@@ -49,12 +49,20 @@ public class FileData : IDataLayer
 
     public string GetRandomWord(string category)
     {
-        string json = File.ReadAllText(WordsFileName);
-        var data = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json);
-        var collection = data[category];
-        Random random = new Random();
-        int randomIndex = random.Next(collection.Count);
-        return collection[randomIndex];
+        try
+        {
+            string json = File.ReadAllText(WordsFileName);
+            var data = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json);
+            var collection = data[category];
+            Random random = new Random();
+            int randomIndex = random.Next(collection.Count);
+            return collection[randomIndex];
+        }
+        catch (JsonException e)
+        {
+            throw new JsonParseException($"JSON_PARSE_ERROR: {e.Message}");
+        }
+        
     }
 
     public string[] GetWordsCategories()
@@ -80,8 +88,9 @@ public class FileData : IDataLayer
         }
         catch (JsonException e)
         {
-            Console.WriteLine("Ошибка при чтении JSON: " + e.Message);
-            return new string[0]; // В случае ошибки возвращаем пустой массив строк.
+            throw new JsonParseException($"JSON_PARSE_ERROR: {e.Message}");
+            // Console.WriteLine("Ошибка при чтении JSON: " + e.Message);
+            // return new string[0]; // В случае ошибки возвращаем пустой массив строк.
         }
     }
 }
