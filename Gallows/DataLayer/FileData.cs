@@ -39,7 +39,7 @@ public class FileData : IDataLayer
         try
         {
             string jsonString = JsonSerializer.Serialize(g);
-            File.WriteAllText(SavedGameFileName, jsonString);
+            File.WriteAllText(Path.Join(_root, SavedGameFileName), jsonString);
         }
         catch (Exception e)
         {
@@ -51,11 +51,13 @@ public class FileData : IDataLayer
     {
         try
         {
-            string json = File.ReadAllText(WordsFileName);
+            var json = File.ReadAllText(Path.Join(_root, WordsFileName));
             var data = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json);
             var collection = data[category];
-            Random random = new Random();
-            int randomIndex = random.Next(collection.Count);
+            
+            var random = new Random();
+            var randomIndex = random.Next(collection.Count);
+            
             return collection[randomIndex];
         }
         catch (JsonException e)
@@ -67,7 +69,7 @@ public class FileData : IDataLayer
 
     public string[] GetWordsCategories()
     {
-        string json = File.ReadAllText(WordsFileName);
+        string json = File.ReadAllText(Path.Join(_root, WordsFileName));
         try
         {
             // Распарсим JSON в объект.
