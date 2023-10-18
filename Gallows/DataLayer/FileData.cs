@@ -7,9 +7,8 @@ public class FileData : IDataLayer
     private readonly string _root = "./";
     private const string SavedGameFileName = "saved_game.json";
     private const string WordsFileName = "words.json";
-    public FileData()
-    {
-    }
+    private const string SettingsFileName = "settings.json";
+    public FileData() { }
 
     public FileData(string root)
     {
@@ -33,7 +32,6 @@ public class FileData : IDataLayer
             throw new GameLoadException($"GAME_LOAD_ERROR: {e.Message}");
         }
     }
-
     public void SaveGame(Game? g)
     {
         try
@@ -46,7 +44,36 @@ public class FileData : IDataLayer
             throw new GameSaveException($"GAME_SAVE_ERROR: {e.Message}");
         }
     }
-
+    public Settings? LoadSettings()
+    {
+        try
+        {
+            var jsonString = File.ReadAllText(Path.Join(_root, SettingsFileName));
+            var s = JsonSerializer.Deserialize<Settings>(jsonString)!;
+            return s;
+        }
+        catch (FileNotFoundException)
+        {
+            return null;
+        }
+        catch (Exception e)
+        {
+            throw new SettingsLoadException($"SETTINGS_LOAD_ERROR: {e.Message}");
+        }
+    }
+    
+    public void SaveSettings(Settings? s)
+    {
+        try
+        {
+            string jsonString = JsonSerializer.Serialize(s);
+            File.WriteAllText(SettingsFileName, jsonString);
+        }
+        catch (Exception e)
+        {
+            throw new SettingsSaveException($"SETTINGS_SAVE_ERROR: {e.Message}");
+        }
+    }
     public string GetRandomWord(string category)
     {
         try
@@ -60,9 +87,9 @@ public class FileData : IDataLayer
             
             return collection[randomIndex];
         }
-        catch (JsonException e)
+        catch (Exception e)
         {
-            throw new JsonParseException($"JSON_PARSE_ERROR: {e.Message}");
+            throw new GetRandomWordException($"GET_RANDOM_WORD_ERROR: {e.Message}");
         }
         
     }
@@ -90,7 +117,7 @@ public class FileData : IDataLayer
         }
         catch (JsonException e)
         {
-            throw new JsonParseException($"JSON_PARSE_ERROR: {e.Message}");
+            throw new GetWordsCategoriesException($"GET_WORDS_CATEGORIES_ERROR: {e.Message}");
             // Console.WriteLine("Ошибка при чтении JSON: " + e.Message);
             // return new string[0]; // В случае ошибки возвращаем пустой массив строк.
         }
