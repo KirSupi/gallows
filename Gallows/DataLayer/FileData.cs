@@ -44,17 +44,17 @@ public class FileData : IDataLayer
             throw new GameSaveException($"GAME_SAVE_ERROR: {e.Message}");
         }
     }
-    public Settings? LoadSettings()
+    public Settings LoadSettings()
     {
         try
         {
             var jsonString = File.ReadAllText(Path.Join(_root, SettingsFileName));
-            var s = JsonSerializer.Deserialize<Settings>(jsonString)!;
+            var s = JsonSerializer.Deserialize<Settings>(jsonString);
             return s;
         }
         catch (FileNotFoundException)
         {
-            return null;
+            return new Settings();
         }
         catch (Exception e)
         {
@@ -62,12 +62,12 @@ public class FileData : IDataLayer
         }
     }
     
-    public void SaveSettings(Settings? s)
+    public void SaveSettings(Settings s)
     {
         try
         {
             string jsonString = JsonSerializer.Serialize(s);
-            File.WriteAllText(SettingsFileName, jsonString);
+            File.WriteAllText(Path.Join(_root, SettingsFileName), jsonString);
         }
         catch (Exception e)
         {
