@@ -12,23 +12,34 @@ public struct Const
 
 public struct Game
 {
-    public int CreatedAt;
-    public int Scores;
-    public string[] PreviousWords;
-    public string CurrentWord;
-    public char[] SelectedLetters;
-    public int Damage;
-    public bool Over;
+    public long CreatedAt = ((DateTimeOffset)DateTime.UtcNow.ToUniversalTime()).ToUnixTimeSeconds();
+    public int Scores = 0;
+    public List<string> PreviousWords;
+    public string CurrentWord = "";
+    public List<char> SelectedLetters;
+    public int Damage = 0;
+    public bool Over = false;
+
+    public Game()
+    {
+        PreviousWords = new();
+        SelectedLetters = new();
+    }
 }
 
 public struct GameState
 {
-    public int Scores;
-    public int PreviousWordsCount;
-    public int CurrentWordLength;
+    public int Scores = 0;
+    public int PreviousWordsCount = 0;
+    public int CurrentWordLength = 0;
     public Dictionary<char,int[]> GuessedLetters; // "a"=>[0, 3] - отгаданная буква и её позиции
-    public int Damage;
-    public bool Over;
+    public int Damage = 0;
+    public bool Over = false;
+
+    public GameState()
+    {
+        GuessedLetters = new();
+    }
 }
 
 public struct Settings

@@ -112,15 +112,29 @@ public class ConsoleUi : IUiLayer
 
     private void GameHandler()
     {
-        var input = Console.ReadLine();
-
+        string input;
+        GameState gameState;
+        
         while (true)
         {
-            if (input == null) return;
-
+            Console.Clear();
+            
+            gameState = _uc.GetState();
+            DrawGame(gameState);
+            
+            input = Console.ReadLine() ?? "";
             if (input.Length == 1 && Const.Alphabet.Contains(input.ToLower()[0]))
             {
                 _uc.MakeMove(input.ToLower()[0]);
+            } else if (input == "!")
+            {
+                _uc.SaveGame();
+                _mode = ModeMenu;
+                break;
+            }
+            else
+            {
+                Console.WriteLine("Невалидный ввод");
             }
         }
     }
@@ -130,18 +144,38 @@ public class ConsoleUi : IUiLayer
         
     }
 
-    private void DrawGame(Game game)
+    private void DrawGame(GameState gameState)
     {
-        Console.WriteLine($"Очки: {game.Scores}\tОтгаданных слов: {game.PreviousWords.Length}");
+        Console.WriteLine($"Очки: {gameState.Scores}\tОтгаданных слов: {gameState.PreviousWordsCount}");
+        Console.WriteLine(GetGallowsState(gameState.Over, gameState.Damage));
+        Console.WriteLine("\tСлово: " + GetWordPlaceholder(gameState.CurrentWordLength, gameState.GuessedLetters));
         Console.WriteLine();
-        
-        Console.WriteLine(GetGallowsState(game.Damage));
+        Console.WriteLine("Введи букву или !, чтоб сохранить и выйти в меню");
     }
 
+    private string GetWordPlaceholder(int currentWordLength, Dictionary<char, int[]> guessedLetters)
+    {
+        var symbolsPlaceholders = new char[currentWordLength];
+
+        for (var i = 0; i < currentWordLength; i++) symbolsPlaceholders[i] = '_';
+        foreach (var guessedLetter in guessedLetters.Keys)
+        {
+            foreach (var index in guessedLetters[guessedLetter])
+            {
+                symbolsPlaceholders[index] = guessedLetter;
+            }
+        }
+        
+        var wordPlaceholder = string.Join(' ', symbolsPlaceholders);
+        
+        return wordPlaceholder;
+    }
+    
     // Возвращает рисунок человечка на виселице в зависимости от его "урона" (от 0 до 100, если больше 100,
     // то человечек уже повешен)
-    private string GetGallowsState(int damage)
+    private string GetGallowsState(bool gameIsOver, int damage)
     {
+        if (gameIsOver) return Consts.Gallows100;
         switch (damage)
         {
             case >= 0 and < 10:

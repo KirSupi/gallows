@@ -38,6 +38,8 @@ public class UseCase : IUseCaseLayer
     public void StartNewGame()
     {
         _game = new Game();
+        _settings = new Settings();
+        _settings.WordsCategory = "животные";
         _game.CurrentWord = _data.GetRandomWord(_settings.WordsCategory);
     }
 
@@ -46,7 +48,7 @@ public class UseCase : IUseCaseLayer
         var s = new GameState();
 
         s.Scores = _game.Scores;
-        s.PreviousWordsCount = _game.PreviousWords.Length;
+        s.PreviousWordsCount = _game.PreviousWords.Count;
         s.CurrentWordLength = _game.CurrentWord.Length;
         // todo fill state
         
