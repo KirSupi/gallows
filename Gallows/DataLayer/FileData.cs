@@ -1,5 +1,6 @@
 using gallows.Domain;
 using System.Text.Json;
+
 namespace gallows.DataLayer;
 
 public class FileData : IDataLayer
@@ -8,7 +9,10 @@ public class FileData : IDataLayer
     private const string SavedGameFileName = "assets/saved_game.json";
     private const string WordsFileName = "assets/words.json";
     private const string SettingsFileName = "assets/settings.json";
-    public FileData() { }
+
+    public FileData()
+    {
+    }
 
     public FileData(string root)
     {
@@ -32,11 +36,12 @@ public class FileData : IDataLayer
             throw new GameLoadException($"GAME_LOAD_ERROR: {e.Message}");
         }
     }
+
     public void SaveGame(Game? g)
     {
         try
         {
-            string jsonString = JsonSerializer.Serialize(g);
+            var jsonString = JsonSerializer.Serialize(g);
             File.WriteAllText(Path.Join(_root, SavedGameFileName), jsonString);
         }
         catch (Exception e)
@@ -44,6 +49,7 @@ public class FileData : IDataLayer
             throw new GameSaveException($"GAME_SAVE_ERROR: {e.Message}");
         }
     }
+
     public Settings LoadSettings()
     {
         try
@@ -61,7 +67,7 @@ public class FileData : IDataLayer
             throw new SettingsLoadException($"SETTINGS_LOAD_ERROR: {e.Message}");
         }
     }
-    
+
     public void SaveSettings(Settings s)
     {
         try
@@ -74,6 +80,7 @@ public class FileData : IDataLayer
             throw new SettingsSaveException($"SETTINGS_SAVE_ERROR: {e.Message}");
         }
     }
+
     public string GetRandomWord(string category)
     {
         try
@@ -81,31 +88,32 @@ public class FileData : IDataLayer
             var json = File.ReadAllText(Path.Join(_root, WordsFileName));
             var data = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json);
             var collection = data[category];
-            
+
             var random = new Random();
             var randomIndex = random.Next(collection.Count);
-            
+
             return collection[randomIndex];
         }
         catch (Exception e)
         {
             throw new GetRandomWordException($"GET_RANDOM_WORD_ERROR: {e.Message}");
         }
-        
     }
 
     public string[] GetWordsCategories()
     {
-        string json = File.ReadAllText(Path.Join(_root, WordsFileName));
+        var json = File.ReadAllText(Path.Join(_root, WordsFileName));
         try
         {
             // Распарсим JSON в объект.
             var data = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json);
-
+            
+            if (data is null) return Array.Empty<string>();
+            
             // Инициализируем массив с размером количества категорий в JSON-файле.
-            string[] categories = new string[data.Keys.Count];
+            var categories = new string[data.Keys.Count];
 
-            int index = 0;
+            var index = 0;
             // Добавляем все ключи (категории) в массив.
             foreach (var key in data.Keys)
             {
