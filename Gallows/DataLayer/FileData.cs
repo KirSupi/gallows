@@ -1,5 +1,6 @@
 using gallows.Domain;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace gallows.DataLayer;
 
@@ -42,6 +43,7 @@ public class FileData : IDataLayer
         try
         {
             var jsonString = JsonSerializer.Serialize(g);
+            Console.WriteLine(jsonString);
             File.WriteAllText(Path.Join(_root, SavedGameFileName), jsonString);
         }
         catch (Exception e)
