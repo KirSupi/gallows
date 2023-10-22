@@ -9,7 +9,7 @@ class Program
 {
     private static void Main()
     {
-        IDataLayer dataLayer = new FileData("./assets");
+        IDataLayer dataLayer = new FileData("./");
         IUseCaseLayer useCaseLayer = new UseCase(dataLayer);
         IUiLayer uiLayer = new ConsoleUi(useCaseLayer);
         uiLayer.Run();

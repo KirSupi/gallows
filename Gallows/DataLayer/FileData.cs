@@ -5,9 +5,9 @@ namespace gallows.DataLayer;
 public class FileData : IDataLayer
 {
     private readonly string _root = "./";
-    private const string SavedGameFileName = "saved_game.json";
-    private const string WordsFileName = "words.json";
-    private const string SettingsFileName = "settings.json";
+    private const string SavedGameFileName = "assets/saved_game.json";
+    private const string WordsFileName = "assets/words.json";
+    private const string SettingsFileName = "assets/settings.json";
     public FileData() { }
 
     public FileData(string root)
@@ -66,7 +66,7 @@ public class FileData : IDataLayer
     {
         try
         {
-            string jsonString = JsonSerializer.Serialize(s);
+            var jsonString = JsonSerializer.Serialize(s);
             File.WriteAllText(Path.Join(_root, SettingsFileName), jsonString);
         }
         catch (Exception e)

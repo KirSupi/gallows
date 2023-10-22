@@ -39,6 +39,33 @@ public class UseCase : IUseCaseLayer
     {
         _game = new Game();
         _settings = _data.LoadSettings();
+        
+        NextWord();
+    }
+
+    public void NextWord()
+    {
+        // заполняем отгаданные буквы
+         var guessedLetters = new Dictionary<char, int[]>();
+        for (var i = 0; i < _game.CurrentWord.Length; i++)
+        {
+            var letter = _game.CurrentWord[i];
+            if (!_game.SelectedLetters.Contains(letter)) continue;
+
+            if (!guessedLetters.ContainsKey(letter))
+            {
+                guessedLetters[letter] = new[] { i };
+            }
+            else
+            {
+                guessedLetters[letter] = guessedLetters[letter].Append(i).ToArray();
+            }
+        }
+
+        // Если мы отгадали всё слово, добавляем его к уже отгаданным
+        if (guessedLetters.Keys.Count == _game.CurrentWord.Length && _game.CurrentWord.Length != 0)
+            _game.PreviousWords.Add(_game.CurrentWord);
+        
         if (string.IsNullOrEmpty(_settings.WordsCategory))
         {
             var categories = _data.GetWordsCategories();
@@ -46,6 +73,9 @@ public class UseCase : IUseCaseLayer
         }
 
         _game.CurrentWord = _data.GetRandomWord(_settings.WordsCategory);
+        _game.SelectedLetters = new List<char>();
+        _game.Damage = 0;
+        _game.Over = false;
     }
 
     public GameState GetState()
@@ -66,13 +96,14 @@ public class UseCase : IUseCaseLayer
         s.Damage = (int)(
             (double)mistakes // сколько ошибок было
             /
-            ((int)Const.Difficulty.Hard - _settings.Difficulty) * _game.CurrentWord.Length // допустимое кол-во ошибок
-                                                                * 100 // получаем проценты
+            (((int)Const.Difficulty.Hard - _settings.Difficulty) * _game.CurrentWord.Length) // допустимое кол-во ошибок
+            * 100 // получаем проценты
         );
 
         // немного округляем урон вверх, если надо
         if (s.Damage > 91) s.Damage = 100;
 
+        // заполняем отгаданные буквы
         s.GuessedLetters = new Dictionary<char, int[]>();
         for (var i = 0; i < _game.CurrentWord.Length; i++)
         {
@@ -89,15 +120,35 @@ public class UseCase : IUseCaseLayer
             }
         }
 
+        // Если мы отгадали всё слово
+        if (s.GuessedLetters.Keys.Count == _game.CurrentWord.Distinct().Count())
+        {
+            s.Over = true;
+        }
+
         return s;
     }
 
     public void MakeMove(char letter)
     {
-        if (_game.Over) return;
+        if (_game.Over)
+            return;
 
-        if (_game.SelectedLetters.Contains(letter)) return;
-        
+        if (_game.SelectedLetters.Contains(letter))
+            return;
+
         _game.SelectedLetters.Add(letter);
+
+        // Начисление очков
+        var letterRepetitions = _game.CurrentWord.Count(let => let == letter);
+
+        if (letterRepetitions == 0)
+        {
+            if (_game.Scores >= 10) _game.Scores -= 10;
+        }
+        else
+        {
+            _game.Scores += letterRepetitions * 100;
+        }
     }
 }
