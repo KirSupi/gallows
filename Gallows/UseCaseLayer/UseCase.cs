@@ -24,9 +24,9 @@ public class UseCase : IUseCaseLayer
 
             return savedGame != null; // возвращаем true, если нашли созранённую игру и загрузили её
         }
-        catch (GameLoadException ex)
+        catch (GameLoadException)
         {
-            Console.WriteLine($"Error loading game: {ex.Message}");
+            Console.WriteLine("Ошибка при загрузке игры");
             // Дополнительная логика обработки ошибки загрузки игры
         }
 
