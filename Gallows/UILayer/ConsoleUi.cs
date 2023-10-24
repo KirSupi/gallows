@@ -156,6 +156,7 @@ public class ConsoleUi : IUiLayer
     private void DrawGame(GameState gameState)
     {
         Console.WriteLine($"Очки: {gameState.Scores}\tОтгаданных слов: {gameState.PreviousWordsCount}");
+        Console.WriteLine($"Категория слова: {gameState.CurrentWordCategory}");
         Console.WriteLine(GetGallowsState(gameState.Damage));
         Console.WriteLine("\tСлово: " + GetWordPlaceholder(gameState.CurrentWordLength, gameState.GuessedLetters));
         Console.WriteLine();

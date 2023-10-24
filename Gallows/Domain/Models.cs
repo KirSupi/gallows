@@ -34,6 +34,7 @@ public struct GameState
     public int Scores = 0;
     public int PreviousWordsCount = 0;
     public int CurrentWordLength = 0;
+    public string CurrentWordCategory = "";
     public Dictionary<char, int[]> GuessedLetters; // "a"=>[0, 3] - отгаданная буква и её позиции
     public int Damage = 0;
     public bool Over = false;

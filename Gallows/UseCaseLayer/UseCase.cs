@@ -85,10 +85,11 @@ public class UseCase : IUseCaseLayer
         s.Scores = _game.Scores;
         s.PreviousWordsCount = _game.PreviousWords.Count;
         s.CurrentWordLength = _game.CurrentWord.Length;
+        s.CurrentWordCategory = _settings.WordsCategory;
 
         var mistakes = 0;
         _game.SelectedLetters.ForEach(
-            (letter) =>
+            letter =>
             {
                 if (!_game.CurrentWord.Contains(letter)) mistakes++;
             }
