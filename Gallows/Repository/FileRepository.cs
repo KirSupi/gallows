@@ -62,11 +62,11 @@ public class SettingsRepository : BaseRepository, ISettingsRepository
         }
     }
 
-    public void SaveSettings(Settings s)
+    public void SaveSettings(Settings settings)
     {
         try
         {
-            var jsonString = JsonSerializer.Serialize(s);
+            var jsonString = JsonSerializer.Serialize(settings);
             File.WriteAllText(Path.Join(Root, PathConstants.SettingsFileName), jsonString);
         }
         catch (Exception e)

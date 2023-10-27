@@ -6,7 +6,7 @@ public interface IUseCase
 {
     void SaveGame();
     bool LoadSavedGame();
-    void SaveSettings();
+    void SaveSettings(string category, int difficulty);
     bool LoadSavedSettings();
     void StartNewGame();
     void NextWord();

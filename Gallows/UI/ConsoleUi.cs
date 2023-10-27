@@ -19,7 +19,8 @@ public class ConsoleUi : IUi
     private readonly string[] _textSettings =
     {
         SettingsButtons.SettingsDifficulty,
-        SettingsButtons.SettingsCategory
+        SettingsButtons.SettingsCategory,
+        SettingsButtons.SettingsExit
     };
 
     private readonly IUseCase _uc;
@@ -148,13 +149,12 @@ public class ConsoleUi : IUi
 
     private void SettingsHandler()
     {
+        Console.Clear();
         for (var i = 1; i <= _textSettings.Length; i++)
         {
             Console.WriteLine($"{i}. {_textSettings[i - 1]}");
         }
-        
         Console.WriteLine("\nВведите номер настройки");
-        
         int selectedSettingsItemIndex;
         while (true)
         {
@@ -166,24 +166,77 @@ public class ConsoleUi : IUi
                     break;
                 }
             }
-
             Console.WriteLine($"Некорректный ввод, надо ввести число от 1 до {_textSettings.Length}");
         }
 
         var selectedSettingsItem = _textSettings[selectedSettingsItemIndex];
-        
+
         switch (selectedSettingsItem)
         {
             case SettingsButtons.SettingsDifficulty:
+            {
+                Console.Clear();
+                Console.WriteLine("\nВыберите уровень сложности");
+                Console.WriteLine("\t1. Легкий");
+                Console.WriteLine("\t2. Средний");
+                Console.WriteLine("\t3. Сложный");
+                Console.WriteLine("\nВведите номер уровня");
+                int selectedDifficultyLevel;
+                while (true)
+                {
+                    if (Int32.TryParse(Console.ReadLine(), out selectedDifficultyLevel))
+                    {
+                        if (selectedDifficultyLevel > 0 && selectedDifficultyLevel <= 4)
+                        {
+                            selectedDifficultyLevel -= 1;
+                            break;
+                        }
+                    }
+
+                    Console.WriteLine($"Некорректный ввод, надо ввести число от 1 до 3");
+                }
+
+                if (selectedDifficultyLevel == 1)
+                    _uc.SaveSettings("", (int)Const.Difficulty.Easy);
+                else if (selectedDifficultyLevel == 2)
+                    _uc.SaveSettings("", (int)Const.Difficulty.Medium);
+                else if (selectedDifficultyLevel == 3) _uc.SaveSettings("", (int)Const.Difficulty.Hard);
+
                 Console.Clear();
                 break;
+            }
             case SettingsButtons.SettingsCategory:
+            {
+                Console.Clear();
                 var categories = _uc.GetWordsCategories();
                 for (var i = 1; i <= categories.Length; i++)
                 {
                     Console.WriteLine($"{i}. {categories[i - 1]}");
                 }
+
                 Console.WriteLine("\nВведите номер категории");
+                int selectedCategoryItemIndex;
+                while (true)
+                {
+                    if (Int32.TryParse(Console.ReadLine(), out selectedCategoryItemIndex))
+                    {
+                        if (selectedCategoryItemIndex > 0 && selectedCategoryItemIndex <= categories.Length)
+                        {
+                            selectedCategoryItemIndex -= 1;
+                            break;
+                        }
+                    }
+
+                    Console.WriteLine($"Некорректный ввод, надо ввести число от 1 до {categories.Length}");
+                }
+
+                var category = categories[selectedCategoryItemIndex];
+                _uc.SaveSettings(category, 0);
+                break;
+            }
+            case SettingsButtons.SettingsExit:
+                Console.Clear();
+                _mode = Modes.ModeMenu;
                 break;
             default:
                 Console.Clear();

@@ -60,7 +60,19 @@ public class UseCase : IUseCase
         }
     }
 
-    public void SaveSettings() => _settingsRepository.SaveSettings(_settings);
+    public void SaveSettings(string category, int difficulty)
+    {
+        if (category != "")
+        {
+            var newSettings = new Settings(_settings.Difficulty, category);
+            _settingsRepository.SaveSettings(newSettings);
+        }
+        else if (difficulty != 0)
+        {
+            var newSettings = new Settings(difficulty, _settings.WordsCategory);
+            _settingsRepository.SaveSettings(newSettings);
+        }
+    }
 
     public void NextWord()
     {

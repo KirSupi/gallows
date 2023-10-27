@@ -49,4 +49,10 @@ public struct Settings
 {
     public int Difficulty;
     public string WordsCategory;
+
+    public Settings(int difficulty, string wordsCategory)
+    {
+        Difficulty = difficulty;
+        WordsCategory = wordsCategory;
+    }
 }

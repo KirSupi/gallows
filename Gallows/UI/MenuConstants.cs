@@ -20,4 +20,5 @@ internal static class SettingsButtons
 {
     public const string SettingsDifficulty = "Изменить сложность";
     public const string SettingsCategory = "Изменить категорию";
+    public const string SettingsExit = "Выход из настроек";
 }
