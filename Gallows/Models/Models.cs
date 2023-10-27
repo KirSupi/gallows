@@ -47,12 +47,24 @@ public struct GameState
 
 public struct Settings
 {
-    public int Difficulty;
-    public string WordsCategory;
+    public int Difficulty { get; set; } = (int)Const.Difficulty.Medium;
+    public string WordsCategory { get; set; } = "";
 
     public Settings(int difficulty, string wordsCategory)
     {
         Difficulty = difficulty;
         WordsCategory = wordsCategory;
+    }
+}
+
+public struct LeaderBoardItem
+{
+    public int Scores { get; set; } = 0;
+    public string Name { get; set; }= "";
+
+    public LeaderBoardItem(int scores, string name)
+    {
+        Scores = scores;
+        Name = name;
     }
 }

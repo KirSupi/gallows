@@ -20,8 +20,8 @@ public interface IWordsRepository
     string GetRandomWord(string category);
 }
 
-public interface IUsersRepository
+public interface ILeaderBoardRepository
 {
-    void SaveUsersToDatabase();
-    void LoadUsersFromDatabase();
+    void AddItem(LeaderBoardItem item);
+    LeaderBoardItem[] GetTopResults(int count);
 }

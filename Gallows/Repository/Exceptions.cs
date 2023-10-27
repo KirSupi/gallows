@@ -29,3 +29,7 @@ public class GetWordsCategoriesException : Exception
 {
     public GetWordsCategoriesException(string message) : base(message) { }
 }
+public class LeaderBoardRepositoryException : Exception
+{
+    public LeaderBoardRepositoryException(string message) : base(message) { }
+}

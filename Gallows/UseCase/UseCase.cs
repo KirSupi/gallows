@@ -8,15 +8,23 @@ public class UseCase : IUseCase
     private readonly IGameRepository _gameRepository;
     private readonly ISettingsRepository _settingsRepository;
     private readonly IWordsRepository _wordsRepository;
+    private readonly ILeaderBoardRepository _leaderBoardRepository;
     private Game _game;
     private Settings _settings;
 
 
-    public UseCase(IGameRepository gameRepo, ISettingsRepository settingsRepository,IWordsRepository wordsRepository)
+    public UseCase(
+        IGameRepository gameRepo,
+        ISettingsRepository settingsRepository,
+        IWordsRepository wordsRepository,
+        ILeaderBoardRepository leaderBoardRepository
+    )
     {
         _gameRepository = gameRepo;
         _settingsRepository = settingsRepository;
         _wordsRepository = wordsRepository;
+        _leaderBoardRepository = leaderBoardRepository;
+        _settings = _settingsRepository.LoadSettings();
     }
 
     public bool LoadSavedGame()
@@ -42,22 +50,6 @@ public class UseCase : IUseCase
         _game = new Game();
         _settings = _settingsRepository.LoadSettings();
         NextWord();
-    }
-    
-    public bool LoadSavedSettings()
-    {
-        try
-        {
-            var savedGame = _gameRepository.LoadSavedGame();
-            if (savedGame != null) _game = savedGame ?? new Game();
-            return savedGame != null; // возвращаем true, если нашли созранённую игру и загрузили её
-        }
-        catch (SettingsLoadException)
-        {
-            return false;
-            // Console.WriteLine("Ошибка при загрузке игры");
-            // Дополнительная логика обработки ошибки загрузки игры
-        }
     }
 
     public void SaveSettings(string category, int difficulty)
@@ -96,7 +88,7 @@ public class UseCase : IUseCase
         // Если мы отгадали всё слово, добавляем его к уже отгаданным
         if (guessedLetters.Keys.Count == _game.CurrentWord.Length && _game.CurrentWord.Length != 0)
             _game.PreviousWords.Add(_game.CurrentWord);
-        
+
         if (string.IsNullOrEmpty(_settings.WordsCategory))
         {
             var categories = _wordsRepository.GetWordsCategories();
@@ -110,6 +102,7 @@ public class UseCase : IUseCase
     }
 
     public string[] GetWordsCategories() => _wordsRepository.GetWordsCategories();
+
     public GameState GetState()
     {
         var s = new GameState();
@@ -128,14 +121,15 @@ public class UseCase : IUseCase
         s.Damage = (int)(
             (double)mistakes // сколько ошибок было
             /
-            (((int)Const.Difficulty.Hard - _settings.Difficulty) * _game.CurrentWord.Length) // допустимое кол-во ошибок
+            (((int)Const.Difficulty.Hard - _settings.Difficulty+3) *
+             (_game.CurrentWord.Length / 2)) // допустимое кол-во ошибок
             * 100 // получаем проценты
             // (((int)Const.Difficulty.Hard - _settings.Difficulty) * _game.CurrentWord.Length) // допустимое кол-во ошибок
-           
         );
 
         // немного округляем урон вверх, если надо
         if (s.Damage > 91) s.Damage = 100;
+        if (s.Damage == 100) s.Over = true;
 
         // заполняем отгаданные буквы
         s.GuessedLetters = new Dictionary<char, int[]>();
@@ -184,5 +178,15 @@ public class UseCase : IUseCase
         {
             _game.Scores += letterRepetitions * 100;
         }
+    }
+
+    public void SaveResult(string name)
+    {
+        _leaderBoardRepository.AddItem(new LeaderBoardItem { Scores = _game.Scores, Name = name });
+    }
+
+    public LeaderBoardItem[] GetLeaderBoard()
+    {
+        return _leaderBoardRepository.GetTopResults(10);
     }
 }

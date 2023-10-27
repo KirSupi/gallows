@@ -12,10 +12,10 @@ public class ConsoleUi : IUi
         MenuButtons.TextMenuNewGame,
         MenuButtons.TextMenuLoadSavedGame,
         MenuButtons.TextMenuSettings,
-        MenuButtons.TextMenuUsersTable,
+        MenuButtons.TextMenuLeaderBoard,
         MenuButtons.TextMenuExit
     };
-    
+
     private readonly string[] _textSettings =
     {
         SettingsButtons.SettingsDifficulty,
@@ -46,6 +46,9 @@ public class ConsoleUi : IUi
                     break;
                 case Modes.ModeSettings:
                     SettingsHandler();
+                    break;
+                case Modes.ModeLeaderBoard:
+                    LeaderBoardHandler();
                     break;
             }
         }
@@ -102,6 +105,10 @@ public class ConsoleUi : IUi
                 _mode = Modes.ModeSettings;
                 Console.Clear();
                 return false;
+            case MenuButtons.TextMenuLeaderBoard:
+                _mode = Modes.ModeLeaderBoard;
+                Console.Clear();
+                return false;
             case MenuButtons.TextMenuExit:
                 Console.Clear();
                 return true;
@@ -125,6 +132,19 @@ public class ConsoleUi : IUi
             {
                 _uc.NextWord();
                 Thread.Sleep(3000);
+                continue;
+            }
+
+            // Если проиграли
+            if (gameState.Over)
+            {
+                var name = Console.ReadLine() ?? "Пусто";
+                _uc.SaveResult(name);
+                Console.WriteLine("Сохраняем результат...");
+                Thread.Sleep(1000);
+                Console.WriteLine("Начинаем новую игру...");
+                Thread.Sleep(1000);
+                _uc.StartNewGame();
                 continue;
             }
 
@@ -154,6 +174,7 @@ public class ConsoleUi : IUi
         {
             Console.WriteLine($"{i}. {_textSettings[i - 1]}");
         }
+
         Console.WriteLine("\nВведите номер настройки");
         int selectedSettingsItemIndex;
         while (true)
@@ -166,6 +187,7 @@ public class ConsoleUi : IUi
                     break;
                 }
             }
+
             Console.WriteLine($"Некорректный ввод, надо ввести число от 1 до {_textSettings.Length}");
         }
 
@@ -187,21 +209,24 @@ public class ConsoleUi : IUi
                     if (Int32.TryParse(Console.ReadLine(), out selectedDifficultyLevel))
                     {
                         if (selectedDifficultyLevel > 0 && selectedDifficultyLevel <= 4)
-                        {
-                            selectedDifficultyLevel -= 1;
                             break;
-                        }
                     }
 
                     Console.WriteLine($"Некорректный ввод, надо ввести число от 1 до 3");
                 }
 
-                if (selectedDifficultyLevel == 1)
-                    _uc.SaveSettings("", (int)Const.Difficulty.Easy);
-                else if (selectedDifficultyLevel == 2)
-                    _uc.SaveSettings("", (int)Const.Difficulty.Medium);
-                else if (selectedDifficultyLevel == 3) _uc.SaveSettings("", (int)Const.Difficulty.Hard);
-
+                switch (selectedDifficultyLevel)
+                {
+                    case 1:
+                        _uc.SaveSettings("", (int)Const.Difficulty.Easy);
+                        break;
+                    case 2:
+                        _uc.SaveSettings("", (int)Const.Difficulty.Medium);
+                        break;
+                    case 3:
+                        _uc.SaveSettings("", (int)Const.Difficulty.Hard);
+                        break;
+                }
                 Console.Clear();
                 break;
             }
@@ -244,6 +269,23 @@ public class ConsoleUi : IUi
         }
     }
 
+    private void LeaderBoardHandler()
+    {
+        Console.Clear();
+        var items = _uc.GetLeaderBoard();
+        for (var i = 1; i <= items.Length; i++)
+        {
+            Console.WriteLine($"{i}. " +
+                              (items[i - 1].Scores > 0 ? $"({items[i - 1].Scores}) {items[i - 1].Name}" : "пусто"));
+        }
+
+        Console.WriteLine("\nНажмите любую клавишу для выхода");
+        Console.ReadKey();
+        Console.WriteLine();
+        Console.Clear();
+        _mode = Modes.ModeMenu;
+    }
+
     private void DrawGame(GameState gameState)
     {
         Console.WriteLine($"Очки: {gameState.Scores}\tОтгаданных слов: {gameState.PreviousWordsCount}");
@@ -252,7 +294,9 @@ public class ConsoleUi : IUi
         Console.WriteLine("\tСлово: " + GetWordPlaceholder(gameState.CurrentWordLength, gameState.GuessedLetters));
         Console.WriteLine();
         Console.WriteLine(
-            gameState.Over ? "Ты отгадал слово! Давай следующее.." : "Введи букву или !, чтоб сохранить и выйти в меню"
+            gameState.Over && gameState.Damage < 100 ? "Ты отгадал слово! Давай следующее.." :
+            gameState.Over ? "Ты проиграл\nВведи своё имя для сохранения результата" :
+            "Введи букву или !, чтоб сохранить и выйти в меню"
         );
     }
 
@@ -300,7 +344,7 @@ public class ConsoleUi : IUi
                 return DrawConstants.Gallows80;
             case >= 90 and < 100:
                 return DrawConstants.Gallows90;
-            case > 100:
+            case >= 100:
                 return DrawConstants.Gallows100;
             default:
                 throw new Exception("damage must be at least 0");
