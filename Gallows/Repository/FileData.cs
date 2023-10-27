@@ -1,8 +1,7 @@
 using gallows.Domain;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
-namespace gallows.DataLayer;
+namespace gallows.Repository;
 
 public class FileData : IDataLayer
 {

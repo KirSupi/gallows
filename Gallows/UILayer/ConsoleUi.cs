@@ -11,6 +11,7 @@ public class ConsoleUi : IUiLayer
 
     private const string TextMenuNewGame = "Новая игра";
     private const string TextMenuLoadSavedGame = "Загрузить сохранённую игру";
+    private const string TextMenuUsersTable = "Таблица лучших игроков";
     private const string TextMenuSettings = "Настройки";
     private const string TextMenuExit = "Выход";
 
@@ -18,6 +19,7 @@ public class ConsoleUi : IUiLayer
     {
         TextMenuNewGame,
         TextMenuLoadSavedGame,
+        TextMenuUsersTable,
         TextMenuSettings,
         TextMenuExit
     };

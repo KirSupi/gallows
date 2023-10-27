@@ -1,4 +1,4 @@
-﻿using gallows.DataLayer;
+﻿using gallows.Repository;
 using gallows.Domain;
 using gallows.UILayer;
 using gallows.UseCaseLayer;
