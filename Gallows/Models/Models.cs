@@ -1,4 +1,4 @@
-namespace gallows.Domain;
+namespace Gallows.Models;
 
 public struct Const
 {

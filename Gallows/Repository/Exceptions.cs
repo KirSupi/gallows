@@ -1,4 +1,4 @@
-namespace gallows.Domain;
+namespace Gallows.Repository;
 
 public class GameLoadException : Exception
 {

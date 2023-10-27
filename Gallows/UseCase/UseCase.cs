@@ -1,52 +1,71 @@
-namespace gallows.UseCaseLayer;
+namespace Gallows.UseCase;
 
-using Domain;
+using Gallows.Models;
+using Gallows.Repository;
 
-public class UseCase : IUseCaseLayer
+public class UseCase : IUseCase
 {
-    private readonly IDataLayer _data;
+    private readonly IGameRepository _gameRepository;
+    private readonly ISettingsRepository _settingsRepository;
+    private readonly IWordsRepository _wordsRepository;
     private Game _game;
     private Settings _settings;
 
 
-    public UseCase(IDataLayer data)
+    public UseCase(IGameRepository gameRepo, ISettingsRepository settingsRepository,IWordsRepository wordsRepository)
     {
-        _data = data;
+        _gameRepository = gameRepo;
+        _settingsRepository = settingsRepository;
+        _wordsRepository = wordsRepository;
     }
 
     public bool LoadSavedGame()
     {
         try
         {
-            var savedGame = _data.LoadSavedGame();
-
+            var savedGame = _gameRepository.LoadSavedGame();
             if (savedGame != null) _game = savedGame ?? new Game();
-
             return savedGame != null; // возвращаем true, если нашли созранённую игру и загрузили её
         }
         catch (GameLoadException)
         {
-            Console.WriteLine("Ошибка при загрузке игры");
+            return false;
+            // Console.WriteLine("Ошибка при загрузке игры");
             // Дополнительная логика обработки ошибки загрузки игры
         }
-
-        return true;
     }
 
-    public void SaveGame() => _data.SaveGame(_game);
+    public void SaveGame() => _gameRepository.SaveGame(_game);
 
     public void StartNewGame()
     {
         _game = new Game();
-        _settings = _data.LoadSettings();
-        
+        _settings = _settingsRepository.LoadSettings();
         NextWord();
     }
+    
+    public bool LoadSavedSettings()
+    {
+        try
+        {
+            var savedGame = _gameRepository.LoadSavedGame();
+            if (savedGame != null) _game = savedGame ?? new Game();
+            return savedGame != null; // возвращаем true, если нашли созранённую игру и загрузили её
+        }
+        catch (SettingsLoadException)
+        {
+            return false;
+            // Console.WriteLine("Ошибка при загрузке игры");
+            // Дополнительная логика обработки ошибки загрузки игры
+        }
+    }
+
+    public void SaveSettings() => _settingsRepository.SaveSettings(_settings);
 
     public void NextWord()
     {
         // заполняем отгаданные буквы
-         var guessedLetters = new Dictionary<char, int[]>();
+        var guessedLetters = new Dictionary<char, int[]>();
         for (var i = 0; i < _game.CurrentWord.Length; i++)
         {
             var letter = _game.CurrentWord[i];
@@ -68,16 +87,17 @@ public class UseCase : IUseCaseLayer
         
         if (string.IsNullOrEmpty(_settings.WordsCategory))
         {
-            var categories = _data.GetWordsCategories();
+            var categories = _wordsRepository.GetWordsCategories();
             if (categories.Length != 0) _settings.WordsCategory = categories[0];
         }
 
-        _game.CurrentWord = _data.GetRandomWord(_settings.WordsCategory);
+        _game.CurrentWord = _wordsRepository.GetRandomWord(_settings.WordsCategory);
         _game.SelectedLetters = new List<char>();
         _game.Damage = 0;
         _game.Over = false;
     }
 
+    public string[] GetWordsCategories() => _wordsRepository.GetWordsCategories();
     public GameState GetState()
     {
         var s = new GameState();
@@ -86,7 +106,6 @@ public class UseCase : IUseCaseLayer
         s.PreviousWordsCount = _game.PreviousWords.Count;
         s.CurrentWordLength = _game.CurrentWord.Length;
         s.CurrentWordCategory = _settings.WordsCategory;
-
         var mistakes = 0;
         _game.SelectedLetters.ForEach(
             letter =>
@@ -99,6 +118,8 @@ public class UseCase : IUseCaseLayer
             /
             (((int)Const.Difficulty.Hard - _settings.Difficulty) * _game.CurrentWord.Length) // допустимое кол-во ошибок
             * 100 // получаем проценты
+            // (((int)Const.Difficulty.Hard - _settings.Difficulty) * _game.CurrentWord.Length) // допустимое кол-во ошибок
+           
         );
 
         // немного округляем урон вверх, если надо

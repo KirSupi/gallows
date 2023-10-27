@@ -1,6 +1,6 @@
-namespace gallows.UILayer;
+namespace Gallows.UI;
 
-public struct Consts
+public struct DrawConstants
 {
     public const string Gallows0 = @"
     

@@ -1,17 +1,18 @@
-﻿using gallows.Repository;
-using gallows.Domain;
-using gallows.UILayer;
-using gallows.UseCaseLayer;
+﻿using Gallows.Repository;
+using Gallows.UI;
+using Gallows.UseCase;
 
-namespace gallows;
 
+namespace Gallows;
 class Program
 {
     private static void Main()
     {
-        IDataLayer dataLayer = new FileData("./");
-        IUseCaseLayer useCaseLayer = new UseCase(dataLayer);
-        IUiLayer uiLayer = new ConsoleUi(useCaseLayer);
-        uiLayer.Run();
+        IGameRepository gameRepository = new GameRepository();
+        ISettingsRepository settingsRepository = new SettingsRepository();
+        IWordsRepository wordsRepository = new WordsRepository();
+        IUseCase useCaseLayer = new UseCase.UseCase(gameRepository, settingsRepository, wordsRepository);
+        IUi ui = new ConsoleUi(useCaseLayer);
+        ui.Run();
     }
 }

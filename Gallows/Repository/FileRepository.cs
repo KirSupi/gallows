@@ -1,30 +1,21 @@
-using gallows.Domain;
 using System.Text.Json;
+using Gallows.Models;
 
-namespace gallows.Repository;
+namespace Gallows.Repository;
 
-public class FileData : IDataLayer
+public class BaseRepository
 {
-    private readonly string _root = "./";
-    private const string SavedGameFileName = "assets/saved_game.json";
-    private const string WordsFileName = "assets/words.json";
-    private const string SettingsFileName = "assets/settings.json";
+    protected const string Root = "./";
+}
 
-    public FileData()
-    {
-    }
-
-    public FileData(string root)
-    {
-        _root = root;
-    }
-
+public class GameRepository : BaseRepository, IGameRepository 
+{
     public Game? LoadSavedGame()
     {
         try
         {
-            var jsonString = File.ReadAllText(Path.Join(_root, SavedGameFileName));
-            var g = JsonSerializer.Deserialize<Game>(jsonString)!;
+            var jsonString = File.ReadAllText(Path.Join(Root, PathConstants.SavedGameFileName));
+            var g = JsonSerializer.Deserialize<Game?>(jsonString)!;
             return g;
         }
         catch (FileNotFoundException)
@@ -42,19 +33,22 @@ public class FileData : IDataLayer
         try
         {
             var jsonString = JsonSerializer.Serialize(g);
-            File.WriteAllText(Path.Join(_root, SavedGameFileName), jsonString);
+            File.WriteAllText(Path.Join(Root, PathConstants.SavedGameFileName), jsonString);
         }
         catch (Exception e)
         {
             throw new GameSaveException($"GAME_SAVE_ERROR: {e.Message}");
         }
     }
+}
 
+public class SettingsRepository : BaseRepository, ISettingsRepository
+{
     public Settings LoadSettings()
     {
         try
         {
-            var jsonString = File.ReadAllText(Path.Join(_root, SettingsFileName));
+            var jsonString = File.ReadAllText(Path.Join(Root, PathConstants.SettingsFileName));
             var s = JsonSerializer.Deserialize<Settings>(jsonString);
             return s;
         }
@@ -73,19 +67,21 @@ public class FileData : IDataLayer
         try
         {
             var jsonString = JsonSerializer.Serialize(s);
-            File.WriteAllText(Path.Join(_root, SettingsFileName), jsonString);
+            File.WriteAllText(Path.Join(Root, PathConstants.SettingsFileName), jsonString);
         }
         catch (Exception e)
         {
             throw new SettingsSaveException($"SETTINGS_SAVE_ERROR: {e.Message}");
         }
     }
-
+}
+public class WordsRepository : BaseRepository, IWordsRepository
+{
     public string GetRandomWord(string category)
     {
         try
         {
-            var json = File.ReadAllText(Path.Join(_root, WordsFileName));
+            var json = File.ReadAllText(Path.Join(Root, PathConstants.WordsFileName));
             var data = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json);
             var collection = data[category];
 
@@ -102,7 +98,7 @@ public class FileData : IDataLayer
 
     public string[] GetWordsCategories()
     {
-        var json = File.ReadAllText(Path.Join(_root, WordsFileName));
+        var json = File.ReadAllText(Path.Join(Root, PathConstants.WordsFileName));
         try
         {
             // Распарсим JSON в объект.
@@ -126,8 +122,7 @@ public class FileData : IDataLayer
         catch (JsonException e)
         {
             throw new GetWordsCategoriesException($"GET_WORDS_CATEGORIES_ERROR: {e.Message}");
-            // Console.WriteLine("Ошибка при чтении JSON: " + e.Message);
-            // return new string[0]; // В случае ошибки возвращаем пустой массив строк.
         }
     }
 }
+

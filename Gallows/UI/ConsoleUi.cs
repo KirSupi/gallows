@@ -1,33 +1,31 @@
 using System.Reflection.Metadata;
-using gallows.Domain;
+using Gallows.Models;
+using Gallows.Repository;
+using Gallows.UseCase;
 
-namespace gallows.UILayer;
+namespace Gallows.UI;
 
-public class ConsoleUi : IUiLayer
+public class ConsoleUi : IUi
 {
-    private const string ModeMenu = "menu";
-    private const string ModeGame = "game";
-    private const string ModeSettings = "settings";
-
-    private const string TextMenuNewGame = "Новая игра";
-    private const string TextMenuLoadSavedGame = "Загрузить сохранённую игру";
-    private const string TextMenuUsersTable = "Таблица лучших игроков";
-    private const string TextMenuSettings = "Настройки";
-    private const string TextMenuExit = "Выход";
-
     private readonly string[] _textMenu =
     {
-        TextMenuNewGame,
-        TextMenuLoadSavedGame,
-        TextMenuUsersTable,
-        TextMenuSettings,
-        TextMenuExit
+        MenuButtons.TextMenuNewGame,
+        MenuButtons.TextMenuLoadSavedGame,
+        MenuButtons.TextMenuSettings,
+        MenuButtons.TextMenuUsersTable,
+        MenuButtons.TextMenuExit
+    };
+    
+    private readonly string[] _textSettings =
+    {
+        SettingsButtons.SettingsDifficulty,
+        SettingsButtons.SettingsCategory
     };
 
-    private readonly IUseCaseLayer _uc;
-    private string _mode = ModeMenu;
+    private readonly IUseCase _uc;
+    private string _mode = Modes.ModeMenu;
 
-    public ConsoleUi(IUseCaseLayer uc)
+    public ConsoleUi(IUseCase uc)
     {
         _uc = uc;
     }
@@ -39,13 +37,13 @@ public class ConsoleUi : IUiLayer
         {
             switch (_mode)
             {
-                case ModeMenu:
+                case Modes.ModeMenu:
                     exit = MenuHandler();
                     break;
-                case ModeGame:
+                case Modes.ModeGame:
                     GameHandler();
                     break;
-                case ModeSettings:
+                case Modes.ModeSettings:
                     SettingsHandler();
                     break;
             }
@@ -80,30 +78,30 @@ public class ConsoleUi : IUiLayer
 
         switch (selectedMenuItem)
         {
-            case TextMenuNewGame:
-                _mode = ModeGame;
+            case MenuButtons.TextMenuNewGame:
+                _mode = Modes.ModeGame;
                 _uc.StartNewGame();
                 Console.Clear();
                 return false;
-            case TextMenuLoadSavedGame:
+            case MenuButtons.TextMenuLoadSavedGame:
                 var exists = _uc.LoadSavedGame();
                 if (exists)
                 {
-                    _mode = ModeGame;
+                    _mode = Modes.ModeGame;
                     Console.Clear();
                 }
                 else
                 {
-                    _mode = ModeMenu;
+                    _mode = Modes.ModeMenu;
                     Console.WriteLine("Сохранений нет");
                 }
 
                 return false;
-            case TextMenuSettings:
-                _mode = ModeSettings;
+            case MenuButtons.TextMenuSettings:
+                _mode = Modes.ModeSettings;
                 Console.Clear();
                 return false;
-            case TextMenuExit:
+            case MenuButtons.TextMenuExit:
                 Console.Clear();
                 return true;
             default:
@@ -114,14 +112,11 @@ public class ConsoleUi : IUiLayer
 
     private void GameHandler()
     {
-        string input;
-        GameState gameState;
-
         while (true)
         {
             Console.Clear();
 
-            gameState = _uc.GetState();
+            var gameState = _uc.GetState();
             DrawGame(gameState);
 
             // Если отгадали слово
@@ -132,7 +127,7 @@ public class ConsoleUi : IUiLayer
                 continue;
             }
 
-            input = Console.ReadLine() ?? "";
+            var input = Console.ReadLine() ?? "";
             if (input.Length == 1 && Const.Alphabet.Contains(input.ToLower()[0]))
             {
                 _uc.MakeMove(input.ToLower()[0]);
@@ -140,19 +135,60 @@ public class ConsoleUi : IUiLayer
             else if (input == "!")
             {
                 _uc.SaveGame();
-                _mode = ModeMenu;
+                _mode = Modes.ModeMenu;
                 break;
             }
             else
             {
                 Console.WriteLine("Невалидный ввод");
-                Thread.Sleep(3000);
+                Thread.Sleep(500);
             }
         }
     }
 
     private void SettingsHandler()
     {
+        for (var i = 1; i <= _textSettings.Length; i++)
+        {
+            Console.WriteLine($"{i}. {_textSettings[i - 1]}");
+        }
+        
+        Console.WriteLine("\nВведите номер настройки");
+        
+        int selectedSettingsItemIndex;
+        while (true)
+        {
+            if (Int32.TryParse(Console.ReadLine(), out selectedSettingsItemIndex))
+            {
+                if (selectedSettingsItemIndex > 0 && selectedSettingsItemIndex <= _textSettings.Length)
+                {
+                    selectedSettingsItemIndex -= 1;
+                    break;
+                }
+            }
+
+            Console.WriteLine($"Некорректный ввод, надо ввести число от 1 до {_textSettings.Length}");
+        }
+
+        var selectedSettingsItem = _textSettings[selectedSettingsItemIndex];
+        
+        switch (selectedSettingsItem)
+        {
+            case SettingsButtons.SettingsDifficulty:
+                Console.Clear();
+                break;
+            case SettingsButtons.SettingsCategory:
+                var categories = _uc.GetWordsCategories();
+                for (var i = 1; i <= categories.Length; i++)
+                {
+                    Console.WriteLine($"{i}. {categories[i - 1]}");
+                }
+                Console.WriteLine("\nВведите номер категории");
+                break;
+            default:
+                Console.Clear();
+                break;
+        }
     }
 
     private void DrawGame(GameState gameState)
@@ -192,27 +228,27 @@ public class ConsoleUi : IUiLayer
         switch (damage)
         {
             case >= 0 and < 10:
-                return Consts.Gallows0;
+                return DrawConstants.Gallows0;
             case >= 10 and < 20:
-                return Consts.Gallows10;
+                return DrawConstants.Gallows10;
             case >= 20 and < 30:
-                return Consts.Gallows20;
+                return DrawConstants.Gallows20;
             case >= 30 and < 40:
-                return Consts.Gallows30;
+                return DrawConstants.Gallows30;
             case >= 40 and < 50:
-                return Consts.Gallows40;
+                return DrawConstants.Gallows40;
             case >= 50 and < 60:
-                return Consts.Gallows50;
+                return DrawConstants.Gallows50;
             case >= 60 and < 70:
-                return Consts.Gallows60;
+                return DrawConstants.Gallows60;
             case >= 70 and < 80:
-                return Consts.Gallows70;
+                return DrawConstants.Gallows70;
             case >= 80 and < 90:
-                return Consts.Gallows80;
+                return DrawConstants.Gallows80;
             case >= 90 and < 100:
-                return Consts.Gallows90;
+                return DrawConstants.Gallows90;
             case > 100:
-                return Consts.Gallows100;
+                return DrawConstants.Gallows100;
             default:
                 throw new Exception("damage must be at least 0");
         }
